@@ -1,6 +1,5 @@
 'use strict';
 
-const fs = require('fs');
 const https = require('https');
 const {Client, Intents} = require('discord.js');
 const milieu = require('milieu');
