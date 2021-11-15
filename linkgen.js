@@ -11,7 +11,8 @@ const config = milieu('nexus', {
     }
 });
 
-const token = config.bot.token;
+const botToken = config.bot.discordToken;
+const nexusToken = config.bot.nexusToken;
 
 function extractLink(content) {
     let lines = content.split(/\r?\n/);
