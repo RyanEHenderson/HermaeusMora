@@ -1,4 +1,9 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const {
+    SlashCommandBuilder
+} = require('@discordjs/builders');
+const {
+    nexusToken
+} = require('../config.json');
 
 module.exports = {
     data: new SlashCommandBuilder()

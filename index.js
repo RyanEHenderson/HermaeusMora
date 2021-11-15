@@ -5,8 +5,7 @@ const {
     Intents
 } = require('discord.js');
 const {
-    discordToken,
-    nexusToken
+    discordToken
 } = require('./config.json');
 
 const client = new Client({
