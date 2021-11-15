@@ -27,18 +27,34 @@ module.exports = {
             .setRequired(true)),
     async execute(interaction) {
         await interaction.deferReply();
-        getLink(interaction);
-        await interaction.editReply('This command is not yet implemented');
+        getLink(interaction).then(link => {
+            interaction.editReply(link);
+        });
     }
 }
 
-function getLink(interaction) {
+async function getLink(interaction) {
     let link = interaction.options.getString('link');
     let version = interaction.options.getString('version');
     let gameName = getGameName(link);
     let modId = getModId(link);
-    getModFiles(gameName, modId);
-    console.log(modId);
+    return new Promise((resolve) => {
+        getModFiles(gameName, modId).then(files => {
+            let fileIds = getFileId(files, version);
+            if (fileIds === null) {
+                resolve('Could not find the specified version');
+                return;
+            }
+            let fileId = fileIds[1][0];
+            let gameId = fileIds[1][1];
+            let modName = fileIds[0];
+            resolve(`Download link to \`${modName}\` version ${version}\nhttps://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}`);
+        }).catch(err => {
+            console.log(err);
+            resolve('An error occured getting the link');
+        });
+    });
+
 }
 
 function getGameName(link) {
@@ -54,21 +70,31 @@ function getModId(link) {
     }
 }
 
-function getModFiles(gameName, modId) {
-    console.log(`https://api.nexusmods.com/v1/games/${gameName}/mods/${modId}/files.json`);
-    https.get(`https://api.nexusmods.com/v1/games/${gameName}/mods/${modId}/files.json`, options, (res) => {
-        res.on('error', (err) => {
-            console.log(err);
-        });
+async function getModFiles(gameName, modId) {
+    return new Promise((resolve, reject) => {
+        https.get(`https://api.nexusmods.com/v1/games/${gameName}/mods/${modId}/files.json`, options, (res) => {
+            res.on('error', (err) => {
+                reject(err);
+            });
 
-        let content = '';
-        res.on('data', (chunk) => {
-            content += chunk;
-        });
-        
-        res.on('end', () => {
-            let files = JSON.parse(content);
-            return files;
+            let content = '';
+            res.on('data', (chunk) => {
+                content += chunk;
+            });
+
+            res.on('end', () => {
+                let files = JSON.parse(content);
+                resolve(files);
+            });
         });
     });
 };
+
+function getFileId(filesJSON, version) {
+    for (let i = 0; i < filesJSON.files.length; i++) {
+        if (filesJSON.files[i].version == version) {
+            return [filesJSON.files[i].name, filesJSON.files[i].id];
+        }
+    }
+    return null;
+}
