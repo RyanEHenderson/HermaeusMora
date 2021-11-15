@@ -18,10 +18,25 @@ module.exports = {
             .setDescription('The version of the mod')
             .setRequired(true)),
     async execute(interaction) {
-        await interaction.reply('This command is not yet implemented');
+        await interaction.deferReply();
+        getLink(interaction);
+        await interaction.editReply('This command is not yet implemented');
     }
 }
 
-function getLink(command) {
+function getLink(interaction) {
+    let link = interaction.options.getString('link');
+    let version = interaction.options.getString('version');
+    console.log(link);
+    console.log(version);
+    getGameName(link);
+    getModId(link);
+}
 
+function getGameName(link) {
+    return link.split('/')[3];
+}
+
+function getModId(link) {
+    return link.split('/')[5];
 }
