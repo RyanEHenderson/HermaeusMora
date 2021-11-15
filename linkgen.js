@@ -1,18 +1,73 @@
 'use strict';
 
 const https = require('https');
-const {Client, Intents} = require('discord.js');
+const {
+    Client,
+    Intents
+} = require('discord.js');
 const milieu = require('milieu');
+const fs = require('fs');
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Client({
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
+});
 const config = milieu('nexus', {
     bot: {
-        token: ''
+        nexusToken: ''
     }
 });
 
-const botToken = config.bot.discordToken;
+const discordToken = config.bot.discordToken;
 const nexusToken = config.bot.nexusToken;
+
+let allSettings = new Map();
+
+class Settings {
+    constructor(command) {
+        this._command = command;
+    }
+
+    get command() {
+        return this._command;
+    }
+
+    set command(value) {
+        this._command = value;
+    }
+}
+
+async function createDirectory(path) {
+    return fs.promises.mkdir(path, {
+        recursive: true
+    });
+}
+
+async function saveSettings(guild) {
+    let settings = allSettings.get(guild.id);
+    return fs.promises.writeFile('./data/' + guild.id + '/settings.json', JSON.stringify({
+        command: settings.command
+    }));
+}
+
+async function loadSettings(guild) {
+    return fs.promises.readFile('./data/' + guild.id + '/settings.json', 'utf8').then((data) => {
+        let settings = JSON.parse(data);
+        allSettings.set(guild.id, new Settings(settings.command));
+    }).catch(() => {
+        allSettings.set(guild.id, new Settings('!nexus'));
+        saveSettings(guild);
+    });
+}
+
+function getSettings(guild) {
+    return allSettings.get(guild.id);
+}
+
+client.on('guildCreate', async (guild) => {
+    createDirectory('./data/' + guild.id).then(() => {
+        loadSettings(guild);
+    });
+});
 
 function extractLink(content) {
     let lines = content.split(/\r?\n/);
@@ -20,10 +75,10 @@ function extractLink(content) {
     let fileId = '';
     lines.forEach((line) => {
         if (line.startsWith('fileID')) {
-            fileId = line.substring(line.indexOf('=')+1, line.length);
+            fileId = line.substring(line.indexOf('=') + 1, line.length);
         }
         if (line.startsWith('url')) {
-            let temp = line.substring(line.indexOf('.com/')+5, line.length);
+            let temp = line.substring(line.indexOf('.com/') + 5, line.length);
             gameId = temp.substring(0, temp.indexOf('/'));
         }
     });
@@ -36,6 +91,12 @@ function extractLink(content) {
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     client.user.setActivity('Nexus Mods');
+
+    client.guilds.cache.forEach((guild) => {
+        createDirectory('./data/' + guild.id).then(() => {
+            loadSettings(guild);
+        });
+    });
 });
 
 client.on('messageCreate', async (message) => {
@@ -72,4 +133,4 @@ client.on('messageCreate', async (message) => {
     })
 });
 
-client.login(token);
+client.login(discordToken);
