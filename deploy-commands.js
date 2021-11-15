@@ -10,7 +10,6 @@ const {
 } = require('discord-api-types/v9');
 const {
     clientId,
-    guildId,
     discordToken
 } = require('./config.json');
 
@@ -26,7 +25,7 @@ const rest = new REST({
     version: '9'
 }).setToken(discordToken);
 
-rest.put(Routes.applicationGuildCommands(clientId, guildId), {
+rest.put(Routes.applicationCommands(clientId), {
     body: commands
 }).then(() => {
     console.log('Successfully added commands!');
