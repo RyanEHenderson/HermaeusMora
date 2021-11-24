@@ -80,6 +80,8 @@ async function getModFiles(gameName, modId) {
     return new Promise((resolve, reject) => {
         https.get(`https://api.nexusmods.com/v1/games/${gameName}/mods/${modId}/files.json`, options, (res) => {
             res.on('error', (err) => {
+                let errorCode = err.code;
+                console.log(errorCode);
                 reject(err);
             });
 
