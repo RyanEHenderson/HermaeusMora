@@ -36,9 +36,13 @@ module.exports = {
 async function getLink(interaction) {
     let link = interaction.options.getString('link');
     let version = interaction.options.getString('version');
-    let gameName = getGameName(link);
-    let modId = getModId(link);
     return new Promise((resolve) => {
+        if (!link.startsWith('https://www.nexusmods.com/')) {
+            resolve('Invalid link: `' + link + '`');
+            return;
+        }
+        let gameName = getGameName(link);
+        let modId = getModId(link);
         getModFiles(gameName, modId).then(files => {
             let fileIds = getFileId(files, version);
             if (fileIds === null) {
