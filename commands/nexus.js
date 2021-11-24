@@ -13,6 +13,8 @@ const options = {
     }
 }
 
+const regex = 'https:\/\/www\.nexusmods\.com\/\w+\/mods\/\d+'
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('nexus')
@@ -37,7 +39,7 @@ async function getLink(interaction) {
     let link = interaction.options.getString('link');
     let version = interaction.options.getString('version');
     return new Promise((resolve) => {
-        if (!link.startsWith('https://www.nexusmods.com/')) {
+        if (!link.match(regex)) {
             resolve('Invalid link: `' + link + '`');
             return;
         }
