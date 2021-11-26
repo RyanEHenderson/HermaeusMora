@@ -21,12 +21,12 @@ module.exports = {
         .setDescription('Retrieves a download link from Nexus Mods')
         .addStringOption(option =>
             option.setName('link')
-            .setDescription('The link to the mod')
-            .setRequired(true))
+                .setDescription('The link to the mod')
+                .setRequired(true))
         .addStringOption(option =>
             option.setName('version')
-            .setDescription('The version of the mod')
-            .setRequired(true)),
+                .setDescription('The version of the mod')
+                .setRequired(true)),
     async execute(interaction) {
         await interaction.deferReply();
         getLink(interaction).then(link => {
@@ -59,14 +59,24 @@ async function getLink(interaction) {
                 return;
             }
             let fileIds = getFileId(files, version);
-            if (fileIds === null) {
+            if (fileIds.length == 0) {
                 resolve('Could not find the specified version');
                 return;
             }
-            let fileId = fileIds[1][0];
-            let gameId = fileIds[1][1];
-            let modName = fileIds[0];
-            resolve(`Download link to \`${modName}\` version ${version}\nhttps://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}`);
+            if (fileIds.length > 1) {
+                let fileNames = '';
+                for (let i = 0; i < fileIds.length; i++) {
+                    let fileId = fileIds[i][1][0];
+                    let gameId = fileIds[i][1][1];
+                    fileNames += fileIds[i][0] + ` https://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}` + '\n';
+                }
+                resolve(`Multiple files found for version ${version}:\n${fileNames}`);
+            } else {
+                let fileId = fileIds[0][1][0];
+                let gameId = fileIds[0][1][1];
+                let modName = fileIds[0][0];
+                resolve(`Download link to \`${modName}\` version ${version}\nhttps://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}`);
+            }
         }).catch(err => {
             console.log(err);
             resolve('An error occured getting the link');
@@ -109,10 +119,11 @@ async function getModFiles(gameName, modId) {
 };
 
 function getFileId(filesJSON, version) {
+    let files = [];
     for (let i = 0; i < filesJSON.files.length; i++) {
         if (filesJSON.files[i].version == version) {
-            return [filesJSON.files[i].name, filesJSON.files[i].id];
+            files.push([filesJSON.files[i].name, filesJSON.files[i].id]);
         }
     }
-    return null;
+    return files;
 }
