@@ -46,6 +46,18 @@ async function getLink(interaction) {
         let gameName = getGameName(link);
         let modId = getModId(link);
         getModFiles(gameName, modId).then(files => {
+            if (files.hasOwnProperty('code')) {
+                let errorCode = files.code;
+                if (errorCode === 404) {
+                    resolve('That mod does not exist');
+                } else if (errorCode === 403) {
+                    resolve('That mod is currently hidden');
+                } else {
+                    resolve('An unknown error occured retrieving this mod');
+                    console.log(files);
+                }
+                return;
+            }
             let fileIds = getFileId(files, version);
             if (fileIds === null) {
                 resolve('Could not find the specified version');
@@ -80,8 +92,6 @@ async function getModFiles(gameName, modId) {
     return new Promise((resolve, reject) => {
         https.get(`https://api.nexusmods.com/v1/games/${gameName}/mods/${modId}/files.json`, options, (res) => {
             res.on('error', (err) => {
-                let errorCode = err.code;
-                console.log(errorCode);
                 reject(err);
             });
 
