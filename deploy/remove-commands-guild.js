@@ -19,11 +19,11 @@ client.once('ready', () => {
         commands.forEach(function (command) {
             guild.commands.delete(command.id).then(function () {
                 console.log(`Deleted command ${command.id} (${command.name}) from ${guildId}`);
-                client.destroy();
             }).catch(function (err) {
                 console.log(err);
             });
         });
+        client.destroy();
     });
 });
 
