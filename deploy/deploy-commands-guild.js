@@ -23,7 +23,7 @@ const rest = new REST({
     version: '9'
 }).setToken(discordToken);
 
-rest.put(Routes.applicationCommands(clientId, guildId), {
+rest.put(Routes.applicationGuildCommands(clientId, guildId), {
     body: commands
 }).then(() => {
     console.log(`Successfully added commands to guild ${guildId}!`);
