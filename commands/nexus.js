@@ -18,22 +18,33 @@ const regex = new RegExp('.*nexusmods\\.com\\/\\w+\\/mods\\/\\d+(\\?.*)?');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('nexus')
-        .setDescription('Retrieves a download link from Nexus Mods')
-        .addStringOption(option =>
-            option.setName('link')
-                .setDescription('The link to the mod')
-                .setRequired(true))
-        .addStringOption(option =>
-            option.setName('version')
-                .setDescription('The version of the mod')
-                .setRequired(true)),
+        .setDescription('Main command for interacting with Nexus Mods API')
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('link')
+                .setDescription('Retrieves a download link from Nexus Mods')
+                .addStringOption(option =>
+                    option
+                        .setName('link')
+                        .setDescription('The link to the mod')
+                        .setRequired(true)
+                )
+                .addStringOption(option =>
+                    option
+                        .setName('version')
+                        .setDescription('The desired version of the mod')
+                        .setRequired(true)
+                )
+        ),
     async execute(interaction) {
         await interaction.deferReply();
-        getLink(interaction).then(link => {
-            interaction.editReply(link);
-        });
+        let subcommand = interaction.options.getSubcommand();
+        if (subcommand === 'link') {
+            let reply = await getLink(interaction);
+            interaction.reply(reply);
+        }
     }
-}
+};
 
 async function getLink(interaction) {
     let link = interaction.options.getString('link');
