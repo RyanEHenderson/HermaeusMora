@@ -8,7 +8,7 @@ const {
 const {
     clientId,
     discordToken
-} = require('./config.json');
+} = require('../config.json');
 
 const commands = [];
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
@@ -25,5 +25,5 @@ const rest = new REST({
 rest.put(Routes.applicationCommands(clientId), {
     body: commands
 }).then(() => {
-    console.log('Successfully added commands!');
+    console.log('Successfully added commands globally!');
 }).catch(console.error);
