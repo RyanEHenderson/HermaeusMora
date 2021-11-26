@@ -68,7 +68,7 @@ async function getLink(interaction) {
                 for (let i = 0; i < fileIds.length; i++) {
                     let fileId = fileIds[i][1][0];
                     let gameId = fileIds[i][1][1];
-                    fileNames += fileIds[i][0] + ` https://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}` + '\n';
+                    fileNames += fileIds[i][0] + ` https://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}\n`;
                 }
                 resolve(`Multiple files found for version ${version}:\n${fileNames}`);
             } else {
