@@ -146,6 +146,9 @@ async function getModInfo(gameName, modId) {
 }
 
 function getFileId(filesJSON, version) {
+    if (version === 'none' || version === 'blank') {
+        version = "";
+    }
     let files = [];
     for (let i = 0; i < filesJSON.files.length; i++) {
         if (filesJSON.files[i].version == version) {
