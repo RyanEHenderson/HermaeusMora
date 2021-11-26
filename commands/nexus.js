@@ -35,6 +35,17 @@ module.exports = {
                         .setDescription('The desired version of the mod')
                         .setRequired(true)
                 )
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+                .setName('versions')
+                .setDescription('Retrieves a list of versions for a mod')
+                .addStringOption(option =>
+                    option
+                        .setName('link')
+                        .setDescription('The link to the mod')
+                        .setRequired(true)
+                )
         ),
     async execute(interaction) {
         await interaction.deferReply();
