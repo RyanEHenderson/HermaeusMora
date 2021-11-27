@@ -49,70 +49,61 @@ module.exports = {
         ),
     async execute(interaction) {
         await interaction.deferReply();
-        let subcommand = interaction.options.getSubcommand();
-        if (subcommand === 'link') {
-            let reply = await getLink(interaction);
-            interaction.reply(reply);
-        }
+        let reply = await handle(interaction);
+        interaction.reply(reply);
     }
 };
 
-async function getLink(interaction) {
+async function handle(interaction) {
+    let subcommand = interaction.options.getSubcommand();
     let link = interaction.options.getString('link');
-    let version = interaction.options.getString('version');
-    return new Promise((resolve) => {
+
+    return new Promise((resolve, reject) => {
         if (!link.match(regex)) {
-            resolve('Invalid link: `' + link + '`');
+            reject('Invalid link: `' + link + '`');
             return;
         }
         let gameName = getGameName(link);
         let modId = getModId(link);
-        getModFiles(gameName, modId).then(files => {
-            if (files.hasOwnProperty('code')) {
-                let errorCode = files.code;
-                if (errorCode === 404) {
-                    resolve('That mod does not exist');
-                } else if (errorCode === 403) {
-                    resolve('That mod is currently hidden');
-                } else {
-                    resolve('An unknown error occured retrieving this mod');
-                    console.log(files);
-                }
-                return;
-            }
-            let fileIds = getFileId(files, version);
-            if (fileIds.length == 0) {
-                resolve('Could not find the specified version');
-                return;
-            }
-            getModInfo(gameName, modId).then(info => {
-                let modName = info.name;
-                if (fileIds.length > 1) {
-                    let fileNames = '';
-                    for (let i = 0; i < fileIds.length; i++) {
-                        let fileId = fileIds[i][1][0];
-                        let gameId = fileIds[i][1][1];
-                        fileNames += fileIds[i][0] + ` https://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}\n`;
-                    }
-                    resolve(`Multiple files found for ${modName} version ${version}:\n${fileNames}`);
-                } else {
-                    let fileId = fileIds[0][1][0];
-                    let gameId = fileIds[0][1][1];
-                    let fileName = fileIds[0][0];
-                    resolve(`Download link to ${modName}: ${fileName} version ${version}\nhttps://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}`);
+        getModFiles(gameName, modId).then((files) => {
+            getModInfo(gameName, modId).then((info) => {
+                if (subcommand === 'link') {
+                    let version = interaction.options.getString('version');
+                    resolve(getLink(version, files, info));
+                } else if (subcommand === 'versions') {
+
                 }
             }).catch(err => {
-                console.log(err);
-                resolve('An error occured getting the mod info');
-
+                reject(err);
             });
         }).catch(err => {
-            console.log(err);
-            resolve('An error occured getting the link');
+            reject(err);
         });
     });
-
 }
+
+function getLink(version, filesJSON, info) {
+    let fileIds = getFileIds(filesJSON, version);
+    if (fileIds.length == 0) {
+        reject('Could not find the specified version');
+        return;
+    }
+    let modName = info.name;
+    if (fileIds.length > 1) {
+        let fileNames = '';
+        for (let i = 0; i < fileIds.length; i++) {
+            let fileId = fileIds[i][1][0];
+            let gameId = fileIds[i][1][1];
+            fileNames += fileIds[i][0] + ` https://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}\n`;
+        }
+        return (`Multiple files found for ${modName} version ${version}:\n${fileNames}`);
+    } else {
+        let fileId = fileIds[0][1][0];
+        let gameId = fileIds[0][1][1];
+        let fileName = fileIds[0][0];
+        return (`Download link to ${modName}: ${fileName} version ${version}\nhttps://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}`);
+    }
+};
 
 function getGameName(link) {
     return link.split('/')[3];
@@ -141,6 +132,20 @@ async function getModFiles(gameName, modId) {
 
             res.on('end', () => {
                 let files = JSON.parse(content);
+
+                if (files.hasOwnProperty('code')) {
+                    let errorCode = files.code;
+                    if (errorCode === 404) {
+                        reject('That mod does not exist');
+                    } else if (errorCode === 403) {
+                        reject('That mod is currently hidden');
+                    } else {
+                        reject('An unknown error occured retrieving this mod');
+                        console.log(files);
+                    }
+                    return;
+                }
+
                 resolve(files);
             });
         });
@@ -167,7 +172,7 @@ async function getModInfo(gameName, modId) {
     });
 }
 
-function getFileId(filesJSON, version) {
+function getFileIds(filesJSON, version) {
     if (version === 'none' || version === 'blank') {
         version = "";
     }
