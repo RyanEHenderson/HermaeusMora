@@ -21,31 +21,31 @@ module.exports = {
         .setDescription('Main command for interacting with Nexus Mods API')
         .addSubcommand(subcommand =>
             subcommand
+            .setName('link')
+            .setDescription('Retrieves a download link from Nexus Mods')
+            .addStringOption(option =>
+                option
                 .setName('link')
-                .setDescription('Retrieves a download link from Nexus Mods')
-                .addStringOption(option =>
-                    option
-                        .setName('link')
-                        .setDescription('The link to the mod')
-                        .setRequired(true)
-                )
-                .addStringOption(option =>
-                    option
-                        .setName('version')
-                        .setDescription('The desired version of the mod')
-                        .setRequired(true)
-                )
+                .setDescription('The link to the mod')
+                .setRequired(true)
+            )
+            .addStringOption(option =>
+                option
+                .setName('version')
+                .setDescription('The desired version of the mod')
+                .setRequired(true)
+            )
         )
         .addSubcommand(subcommand =>
             subcommand
-                .setName('versions')
-                .setDescription('Retrieves a list of versions for a mod')
-                .addStringOption(option =>
-                    option
-                        .setName('link')
-                        .setDescription('The link to the mod')
-                        .setRequired(true)
-                )
+            .setName('versions')
+            .setDescription('Retrieves a list of versions for a mod')
+            .addStringOption(option =>
+                option
+                .setName('link')
+                .setDescription('The link to the mod')
+                .setRequired(true)
+            )
         ),
     async execute(interaction) {
         await interaction.deferReply();
