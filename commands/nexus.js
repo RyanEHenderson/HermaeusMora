@@ -50,7 +50,7 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
         let reply = await handle(interaction);
-        interaction.reply(reply);
+        interaction.editReply(reply);
     }
 };
 
@@ -71,7 +71,7 @@ async function handle(interaction) {
                     let version = interaction.options.getString('version');
                     resolve(getLink(version, files, info));
                 } else if (subcommand === 'versions') {
-
+                    resolve(getVersions(files, info));
                 }
             }).catch(err => {
                 reject(err);
@@ -183,4 +183,15 @@ function getFileIds(filesJSON, version) {
         }
     }
     return files;
+}
+
+function getVersions(filesJSON, info) {
+    let versions = [];
+    for (let i = 0; i < filesJSON.files.length; i++) {
+        if (!versions.includes(filesJSON.files[i].version)) {
+            versions.push(filesJSON.files[i].version);
+        }
+    }
+    let versionString = `Found the following versions for ${info.name}: ${versions.join(', ')}`;
+    return versionString;
 }
