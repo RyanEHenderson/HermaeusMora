@@ -23,7 +23,6 @@ client.once('ready', () => {
                 console.log(err);
             });
         });
-        client.destroy();
     });
 });
 
