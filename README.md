@@ -14,4 +14,5 @@ and available for testing by cloning this repository and using your own API key.
 The bot makes use of Discord slash commands, which Discord will reognize and help autocomplete,
 including command arguments. The available commands and arguments are as follows:
 
-`/nexus link:<link> version:<version>`
+`/nexus link link:<link> version:<version>`
+`/nexus version link:<link>`
