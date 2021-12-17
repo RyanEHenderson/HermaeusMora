@@ -85,8 +85,7 @@ async function handle(interaction) {
 function getLink(version, filesJSON, info) {
     let fileIds = getFileIds(filesJSON, version);
     if (fileIds.length == 0) {
-        reject('Could not find the specified version');
-        return;
+        return 'Could not find the specified version';
     }
     let modName = info.name;
     if (fileIds.length > 1) {
@@ -122,7 +121,8 @@ async function getModFiles(gameName, modId) {
     return new Promise((resolve, reject) => {
         https.get(`https://api.nexusmods.com/v1/games/${gameName}/mods/${modId}/files.json`, options, (res) => {
             res.on('error', (err) => {
-                reject(err);
+                console.log(err);
+                reject('An unknown error occured retrieving this mod');
             });
 
             let content = '';
@@ -132,7 +132,6 @@ async function getModFiles(gameName, modId) {
 
             res.on('end', () => {
                 let files = JSON.parse(content);
-
                 if (files.hasOwnProperty('code')) {
                     let errorCode = files.code;
                     if (errorCode === 404) {
@@ -140,9 +139,12 @@ async function getModFiles(gameName, modId) {
                     } else if (errorCode === 403) {
                         reject('That mod is currently hidden');
                     } else {
-                        reject('An unknown error occured retrieving this mod');
                         console.log(files);
+                        reject('An unknown error occured retrieving this mod');
                     }
+                    return;
+                } else if (files.hasOwnProperty('message')) {
+                    reject('An error occured');
                     return;
                 }
 
@@ -156,7 +158,8 @@ async function getModInfo(gameName, modId) {
     return new Promise((resolve, reject) => {
         https.get(`https://api.nexusmods.com/v1/games/${gameName}/mods/${modId}.json`, options, (res) => {
             res.on('error', (err) => {
-                reject(err);
+                console.log(err);
+                reject('An unknown error occured retrieving mod info');
             });
 
             let content = '';
