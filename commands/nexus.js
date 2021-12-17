@@ -111,7 +111,8 @@ function getLink(version, filesJSON, info) {
         for (let i = 0; i < fileIds.length; i++) {
             let fileId = fileIds[i][1][0];
             let gameId = fileIds[i][1][1];
-            fileNames += fileIds[i][0] + ` https://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}\n`;
+            let uploadTime = fileIds[i][2].substring(0, 19);
+            fileNames += fileIds[i][0] + ` ${uploadTime} https://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${fileId}&game_id=${gameId}\n`;
         }
         return (`Multiple files found for ${modName} version ${version}:\n${fileNames}`);
     } else {
@@ -200,7 +201,7 @@ function getFileIds(filesJSON, version) {
     let files = [];
     for (let i = 0; i < filesJSON.files.length; i++) {
         if (filesJSON.files[i].version == version) {
-            files.push([filesJSON.files[i].name, filesJSON.files[i].id]);
+            files.push([filesJSON.files[i].name, filesJSON.files[i].id, filesJSON.files[i].uploaded_time]);
         }
     }
     return files;
