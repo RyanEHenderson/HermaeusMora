@@ -46,6 +46,11 @@ module.exports = {
                 .setDescription('The link to the mod')
                 .setRequired(true)
             )
+        )
+        .addSubcommand(subcommand =>
+            subcommand
+            .setName('help')
+            .setDescription('Retrieves a list of commands')
         ),
     async execute(interaction) {
         await interaction.deferReply();
@@ -56,6 +61,19 @@ module.exports = {
 
 async function handle(interaction) {
     let subcommand = interaction.options.getSubcommand();
+
+    if (subcommand === 'help') {
+        let help = 'This bot is used to retrieve version and download link info from <https://nexusmods.com>\n';
+        help += 'To get a download link, use the following format:\n';
+        help += '`/nexus link <link> <version>`\n';
+        help += 'To get a list of versions, use the following format:\n';
+        help += '`/nexus versions <link>`\n\n';
+        help += 'This is an open source project licensed under GPLv3\n';
+        help += 'The source code is available here: <https://github.com/RyanEHenderson/HermaeusMora>';
+        help += 'This project is currently in a testing phase and is only available in Lexy\'s LOTD server';
+        return help;
+    }
+
     let link = interaction.options.getString('link');
 
     return new Promise((resolve, reject) => {
