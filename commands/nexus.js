@@ -55,7 +55,21 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
         let reply = await handle(interaction);
-        interaction.editReply(reply);
+        if (reply.length > 2000) {
+            await interaction.editReply('Text response is too long for Discord, sending in multiple parts');
+            let tempReply = '';
+            let lines = reply.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                if (tempReply.length + lines[i].length > 2000) {
+                    await interaction.followUp(tempReply);
+                    tempReply = '';
+                }
+                tempReply += lines[i] + '\n';
+            }
+            await interaction.followUp(tempReply);
+        } else {
+            await interaction.editReply(reply);
+        }
     }
 };
 
