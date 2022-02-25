@@ -83,7 +83,7 @@ async function handle(interaction) {
         help += 'To get a list of versions, use the following format:\n';
         help += '`/nexus versions <link>`\n\n';
         help += 'This is an open source project licensed under GPLv3\n';
-        help += 'The source code is available here: <https://github.com/RyanEHenderson/HermaeusMora>';
+        help += 'The source code is available here: <https://github.com/RyanEHenderson/HermaeusMora>\n ';
         help += 'This project is currently in a testing phase and is only available in Lexy\'s LOTD server';
         return help;
     }
