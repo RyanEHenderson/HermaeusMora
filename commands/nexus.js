@@ -13,7 +13,7 @@ const options = {
     }
 }
 
-const regex = new RegExp('.*nexusmods\\.com\\/\\w+\\/mods\\/\\d+(\\?.*)?');
+const regex = new RegExp(/.*nexusmods\.com\/\w+\/mods\/\d+(\?.*)?/g);
 
 module.exports = {
     data: new SlashCommandBuilder()
