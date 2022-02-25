@@ -91,8 +91,11 @@ async function handle(interaction) {
     let link = interaction.options.getString('link');
 
     return new Promise((resolve, reject) => {
+        if (link.split(' ').length > 1) {
+            reject(`Invalid link: \`${link}\``);
+        }
         if (!link.match(regex)) {
-            reject('Invalid link: `' + link + '`');
+            reject(`Invalid link: \`${link}\``);
             return;
         }
         let gameName = getGameName(link);
