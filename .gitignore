@@ -323,3 +323,6 @@ $RECYCLE.BIN/
 
 # Ensure user token is not committed
 config.json
+
+# Don't commit build files
+build/
